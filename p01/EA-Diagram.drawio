@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-04-28T15:40:52.652Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" etag="9q1aodUJkJkGJaVJE-v7" version="24.3.1" type="github">
+<mxfile host="app.diagrams.net" modified="2024-04-28T15:41:17.834Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" etag="XYNR9EgH8WOVAc15L3lP" version="24.3.1" type="github">
   <diagram name="Page-1" id="Cw1P0HNPZCmHKnwz0BkA">
     <mxGraphModel dx="2261" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -360,7 +360,7 @@
         <mxCell id="16Hc_yWXkNXNdPKT6v9E-71" value="R2 - médicos a cada dia da semana estão alocados a uma e apenas uma clínica" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-375" y="1060" width="530" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="16Hc_yWXkNXNdPKT6v9E-74" value="R2" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+        <mxCell id="16Hc_yWXkNXNdPKT6v9E-74" value="&lt;font color=&quot;#ff0324&quot;&gt;R2&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="100" y="455" width="40" height="30" as="geometry" />
         </mxCell>
         <mxCell id="16Hc_yWXkNXNdPKT6v9E-76" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" parent="1" vertex="1">
