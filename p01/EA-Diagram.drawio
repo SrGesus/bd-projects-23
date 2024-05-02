@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-05-02T16:09:03.320Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/118.0" etag="_XRqvKNHGOcl41ygabpt" version="24.3.1" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2024-05-02T16:28:50.977Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/118.0" etag="gJgV4ccyqqjpm36j7lFx" version="24.3.1" type="github" pages="2">
   <diagram name="Page-1" id="Cw1P0HNPZCmHKnwz0BkA">
-    <mxGraphModel dx="2704" dy="530" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="3054" dy="707" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -633,8 +633,8 @@
             <mxPoint x="-672" y="555" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="RsZwPr8ElWJB7xSxpVb0-161" value="&lt;div align=&quot;left&quot;&gt;Restrições de Integridade:&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;RI-1 - O Telefone é único para cada entitdade Clínica&lt;br&gt;RI-2 - A Morada é unica para cada entitdade Clínica&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;RI-3 - Sintoma tem de participar em pelo menos numa destas associações&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-4 - Sintoma só pode ser descrito por Paciente da consulta em que ele é registado&lt;/div&gt;&lt;div&gt;RI-5 - Sintoma só pode ser observado por Médico da consulta em que ele é registado&lt;/div&gt;&lt;div&gt;RI-7 - Médico no Dia Útil da Semana correspondente à Data tem de estar alocado à clínica em que o serviço de saúde é realizado&lt;br&gt;RI-8 - Serviço de saúde só pode estar associado a uma consulta ou um serviço de enfermagem, não ambos&lt;/div&gt;&lt;div&gt;RI-9 - Cada par Médico Dia Útil da Semana é único e existe&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-11 - O mesmo Médico, ou Paciente não pode estar associado a Horários sobrepostos&lt;/div&gt;&lt;div&gt;RI-12 - Enfermeiro tem de estar alocado à clínica em que o serviço de saúde é realizado&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="193" y="790.5" width="710" height="170" as="geometry" />
+        <mxCell id="RsZwPr8ElWJB7xSxpVb0-161" value="&lt;div align=&quot;left&quot;&gt;Restrições de Integridade:&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;RI-1 - O Telefone é único para cada entitdade Clínica&lt;br&gt;RI-2 - A Morada é unica para cada entitdade Clínica&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;RI-3 - Sintoma tem de participar em pelo menos numa destas associações&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-4 - Sintoma só pode ser descrito por Paciente da consulta em que ele é registado&lt;/div&gt;&lt;div&gt;RI-5 - Sintoma só pode ser observado por Médico da consulta em que ele é registado&lt;/div&gt;&lt;div&gt;RI-7 - Médico no Dia Útil da Semana correspondente à Data tem de estar alocado à clínica em que o serviço de saúde é realizado&lt;br&gt;RI-8 - Serviço de saúde só pode estar associado a uma consulta ou um serviço de enfermagem, não ambos&lt;/div&gt;&lt;div&gt;RI-9 - Cada par Médico Dia Útil da Semana é único e existe&lt;/div&gt;&lt;div&gt;RI-10 - A especialidade é escolhida de uma lista de especialidades reconhecida da ordem dos médicos&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-11 - O mesmo Médico, ou Paciente não pode estar associado a Horários sobrepostos&lt;/div&gt;&lt;div&gt;RI-12 - Enfermeiro tem de estar alocado à clínica em que o serviço de saúde é realizado&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="193" y="783.5" width="691" height="185" as="geometry" />
         </mxCell>
         <mxCell id="PfvPxlRy1LQpU3KQDSin-21" value="" style="group;fillColor=none;" parent="1" vertex="1" connectable="0">
           <mxGeometry x="437.5" y="456" width="50" height="50" as="geometry" />
@@ -1076,6 +1076,12 @@
         </mxCell>
         <mxCell id="PfvPxlRy1LQpU3KQDSin-219" value="RI-7&lt;br&gt;&lt;div&gt;RI-8&lt;/div&gt;&lt;div&gt;RI-11&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="762" y="493" width="47" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="prRMVZJYkapQ7JgWEXwn-1" value="RI-9" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="850" y="694.5" width="40" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="prRMVZJYkapQ7JgWEXwn-2" value="RI-10" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1009" y="567" width="46" height="26" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
