@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-05-03T16:41:01.486Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/118.0" etag="-dfxxfbY23vmNG7eBlDQ" version="24.3.1" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2024-05-03T16:51:37.382Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/118.0" etag="rJuOVkTQAWhlynqshino" version="24.3.1" type="github" pages="2">
   <diagram name="Page-1" id="Cw1P0HNPZCmHKnwz0BkA">
     <mxGraphModel dx="1313" dy="663" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -21,8 +21,8 @@
         <mxCell id="PfvPxlRy1LQpU3KQDSin-89" value="" style="whiteSpace=wrap;html=1;fillColor=none;dashed=1;" parent="1" vertex="1">
           <mxGeometry x="495" y="254" width="564" height="366" as="geometry" />
         </mxCell>
-        <mxCell id="RsZwPr8ElWJB7xSxpVb0-161" value="&lt;div align=&quot;left&quot;&gt;Restrições de Integridade:&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;RI-1 - O Telefone é único para cada entitdade Clínica&lt;br&gt;RI-2 - A Morada é unica para cada entitdade Clínica&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;RI-3 - Sintoma tem de participar em pelo menos numa destas associações&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-4 - Sintoma só pode ser descrito por Paciente da consulta em que ele é registado&lt;/div&gt;&lt;div&gt;RI-5 - Sintoma só pode ser observado por Médico da consulta em que ele é registado&lt;/div&gt;&lt;div&gt;&lt;strike&gt;RI-6 - Nome de sintoma qualitativo é proveniente de lista do vocabulário controlado SNOMED CT&lt;/strike&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-7 - Médico no Dia Útil da Semana correspondente à Data tem de estar alocado à clínica em que o serviço de saúde é realizado&lt;br&gt;RI-8 - Hora de início está entre as 8:00 e 19:30&lt;/div&gt;&lt;div&gt;RI-9 - Cada par Médico Dia Útil da Semana é único e existe&lt;/div&gt;&lt;div&gt;&lt;strike&gt;RI-10 - A especialidade é escolhida de uma lista de especialidades reconhecida da ordem dos médicos&lt;/strike&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-11 - O mesmo Médico, ou Paciente não pode estar associado a Horários sobrepostos&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="193" y="848" width="691" height="199" as="geometry" />
+        <mxCell id="RsZwPr8ElWJB7xSxpVb0-161" value="&lt;div align=&quot;left&quot;&gt;Restrições de Integridade:&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;RI-1 - O Telefone é único para cada entitdade Clínica&lt;br&gt;RI-2 - A Morada é unica para cada entitdade Clínica&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;RI-3 - Sintoma tem de participar em pelo menos numa destas associações&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-4 - Sintoma só pode ser descrito por Paciente da consulta em que ele é registado&lt;/div&gt;&lt;div&gt;RI-5 - Sintoma só pode ser observado por Médico da consulta em que ele é registado&lt;/div&gt;&lt;div&gt;&lt;div&gt;RI-6 - O mesmo Médico, ou Paciente não pode estar associado a Horários sobrepostos&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;strike&gt;RI-6 - Nome de sintoma qualitativo é proveniente de lista do vocabulário controlado SNOMED CT&lt;/strike&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;RI-7 - Médico no Dia Útil da Semana correspondente à Data tem de estar alocado à clínica em que o serviço de saúde é realizado&lt;br&gt;RI-8 - Hora de início está entre as 8:00 e 19:30&lt;/div&gt;&lt;div&gt;RI-9 - Cada par Médico Dia Útil da Semana é único e existe na relação&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;strike&gt;RI-10 - A especialidade é escolhida de uma lista de especialidades reconhecida da ordem dos médicos&lt;/strike&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="193" y="855" width="691" height="185" as="geometry" />
         </mxCell>
         <mxCell id="PfvPxlRy1LQpU3KQDSin-21" value="" style="group;fillColor=none;" parent="1" vertex="1" connectable="0">
           <mxGeometry x="437.5" y="456" width="50" height="50" as="geometry" />
@@ -134,7 +134,7 @@
           <mxGeometry x="691.5" y="336" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="PfvPxlRy1LQpU3KQDSin-53" value="Hora&lt;br&gt;Início" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;verticalAlign=bottom;spacingBottom=0;" parent="1" vertex="1">
-          <mxGeometry x="803" y="301" width="70" height="30" as="geometry" />
+          <mxGeometry x="834" y="351" width="70" height="30" as="geometry" />
         </mxCell>
         <mxCell id="PfvPxlRy1LQpU3KQDSin-58" value="consulta" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="759" y="443" width="63" height="26" as="geometry" />
@@ -416,8 +416,8 @@
         <mxCell id="PfvPxlRy1LQpU3KQDSin-202" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" parent="1" source="PfvPxlRy1LQpU3KQDSin-200" target="PfvPxlRy1LQpU3KQDSin-203" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="390" y="354" />
-              <mxPoint x="390" y="354" />
+              <mxPoint x="416" y="361" />
+              <mxPoint x="390" y="361" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -459,8 +459,8 @@
         <mxCell id="PfvPxlRy1LQpU3KQDSin-218" value="descreve &amp;lt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="421" y="304" width="80" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="PfvPxlRy1LQpU3KQDSin-219" value="RI-7&lt;br&gt;&lt;div&gt;RI-8&lt;/div&gt;&lt;div&gt;RI-11&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="762" y="493" width="47" height="55" as="geometry" />
+        <mxCell id="PfvPxlRy1LQpU3KQDSin-219" value="RI-7&lt;br&gt;&lt;div&gt;RI-9&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="731.5" y="463" width="40" height="41" as="geometry" />
         </mxCell>
         <mxCell id="prRMVZJYkapQ7JgWEXwn-1" value="RI-9" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="850" y="694.5" width="40" height="26" as="geometry" />
@@ -479,8 +479,8 @@
         <mxCell id="prRMVZJYkapQ7JgWEXwn-3" value="&lt;div&gt;Qualitativo&lt;/div&gt;" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="207" y="371" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="prRMVZJYkapQ7JgWEXwn-5" value="RI-6" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="215" y="347" width="40" height="26" as="geometry" />
+        <mxCell id="EUOAHrqgVfHBvP0tPmd9-1" value="&lt;div&gt;RI-8&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="890" y="334" width="40" height="26" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
