@@ -1,142 +1,261 @@
 import random
 import datetime
+import sys
+
+primeiros_nomes = [ "Afonso", "Beatriz", "Carlos", "Diana", "Eduardo", "Fernanda", "Gabriel", "Helena", "Igor", "Juliana", "Joaquim", "Larissa", "Marcos", "Natália", "Otávio", "Paula",  "Quintino", "Raquel", "Sandro", "Tatiana", "Ubirajara", "Valéria", "Washington",  "Xavier", "Iara", "Zeca", "Adriana", "Breno", "Camila", "Daniel", "Elisa", "Fabio",  "Gustavo", "Heloísa", "Isabela", "João", "Cátia", "Leonardo", "Mariana", "Nicolas",  "Olivia", "Pedro", "Margarida", "Renato", "Sofia", "Tiago", "Ursula", "Vitor", "Guilherme",  "Ximena", "Yuri", "Zilda", "Andre", "Bruna", "Claudia", "Diego", "Erica", "Filipe",  "Giovanna", "Humberto", "Ingrid", "José", "Karla", "Luan", "Marta", "Nuno", "Osvaldo",  "Priscila", "Quitéria", "Rafael", "Silvia", "Tadeu", "Ulisses", "Vanessa", "Wagner",  "Xuxa", "Francisca", "Zoraide", "Ana", "Bernardo", "Catarina", "Diogo", "Emanuel",  "Francisco", "Gabriela", "Henrique", "Ivone", "Joana", "Kevin", "Lúcia", "Matheus",  "Neusa", "Oscar", "Patrícia", "Querubina", "Rodrigo", "Simone", "Telma", "Ubiraci",  "Viviane", "Wellington", "Yasmin", "Zé"]
+ultimos_nomes = [ "Almeida", "Barbosa", "Cardoso", "Dias", "Evangelista", "Ferreira", "Gomes", "Henrique", "Ibarra", "Jardim", "Klein", "Lima", "Macedo", "Nascimento", "Oliveira", "Pereira",  "Quintana", "Rodrigues", "Santos", "Teixeira", "Uchoa", "Vieira", "Xavier", "Yamamoto",  "Zanetti", "Araújo", "Barros", "Cunha", "Duarte", "Esteves", "Faria", "Gonçalves",  "Hernandez", "Igrejas", "Junqueira", "Kawasaki", "Lopes", "Martins", "Neves",  "Ortega", "Pires", "Queiroz", "Ribeiro", "Silva", "Tavares", "Ulhoa", "Valente",  "Werneck", "Ximenes", "Yanez", "Zara", "Antunes", "Bastos", "Castro", "Diniz",  "Espírito Santo", "Furtado", "Guimarães", "Hidalgo", "Ivo", "Kuhn",  "Lacerda", "Monteiro", "Noronha", "Ornelas", "Pimenta", "Queiroga", "Ramos",  "Souza", "Torres", "Urbano", "Vasconcelos", "Witt", "Yamada", "Zanin",  "Azevedo", "Botelho", "Correia", "Domingues", "Franco", "Gouveia",  "Horta", "Bananeira", "Koch", "Leite", "Marques", "Nogueira", "Pimentel",  "Quirino", "Reis", "Siqueira", "Ulian", "Vidal", "Weber",  "Zanini", "Bittencourt", "Cabral", "Damasceno", "Evaristo", "Freitas",  "Garcia", "Homem", "Inácio", "Carvalho"]
+nomes = [f"{primeiro} {ultimo}" for primeiro in primeiros_nomes for ultimo in ultimos_nomes]
+nif = 200000000
+telefone = 910000000
+moradas = [ ["Rua %, 1150-015 Lisboa", 1], ["Rua %, 1100-202 Lisboa", 1], ["Rua %, 2580-649 Carregado", 1], ["Rua %, 2635-018 Rio de Mouro", 1], ["Rua %, 2775-615 Carcavelos", 1]]
+especialidades = ['clínica geral', 'ortopedia', 'cardiologia', 'dermatologia', 'neurologia', 'oncologia']
+
+def dict_to_sql(table_name, data):
+  """Converts a list of dictionaries of the same type 
+  to a list of SQL INSERT statements."""
+  statement = [
+    f"-- {len(data)} rows for table {table_name}",
+    f"INSERT INTO {table_name} ({', '.join(data[0].keys())}) VALUES"
+  ]
+  for row in data:
+    values = ', '.join([f"'{value}'" if value != 'NULL' else 'NULL' for value in row.values()])
+    statement.append(f"({values}),")
+  statement[-1] = statement[-1][:-1] + ';'
+  return '\n' + '\n'.join(statement)
+
+def write_to_file(filename, sql_statements):
+  with open(filename, 'w') as f:
+    for line in sql_statements:
+      f.write(line + '\n')
+      print(line)
 
 def generate_clinicas():
-  nomes = [ 'Centro Clinico dos Anjos', 'Clinica Sorriso Famoso', 
-    'Clinica Dentejo', 'Clinica Joaquim Chaves Sintra', 'Clinica Sabeanas']
-  telefones = [ '213561336', '213472156', '263853342', '214124300', '218025501']
-  moradas = [
-    'Avenida Almirante Reis 133, 1150-015 Lisboa', 
-    'Rua Augusta 280, 1100-202 Lisboa', 
-    'Rua Poço Pedreiro, 2580-649 Carregado', 
-    'Rua Alto do Forte IC 19, 2635-018 Rio de Mouro', 
-    'Praça Do Junqueiro 4, 2775-615 Carcavelos'
+  return [
+    {"nome": "Centro Clinico dos Anjos", "telefone": "213561336", "morada": "Avenida Almirante Reis 1, 1150-015 Lisboa"},
+    {"nome": "Clinica Sorriso Famoso", "telefone": "213472156", "morada": "Rua Augusta 1, 1100-202 Lisboa"},
+    {"nome": "Clinica Dentejo", "telefone": "263853342", "morada": "Rua Poço Pedreiro 1, 2580-649 Carregado"},
+    {"nome": "Clinica Joaquim Chaves Sintra", "telefone": "214124300", "morada": "Rua Alto do Forte 1, 2635-018 Rio de Mouro"},
+    {"nome": "Clinica Sabeanas", "telefone": "218025501", "morada": "Praça Do Junqueiro 1, 2775-615 Carcavelos"}
   ]
-  sql_statements = []
-  for i in range(5):
-    sql_statements.append(f"INSERT INTO clinica (nome, telefone, morada) VALUES ('{nomes[i]}', '{telefones[i]}', '{moradas[i]}');")
-  return sql_statements
+
 
 def generate_enfermeiros(clinicas):
-  sql_statements = []
-  enfermeiro_id = 1
+  enfermeiros = []
+  global nif
+  global telefone
   for clinica in clinicas:
     for i in range(random.randint(5, 6)):
-      nif = str(enfermeiro_id).zfill(9)
-      nome = f'Enfermeiro {enfermeiro_id}'
-      telefone = f'91000000{i}'
-      morada = f'Rua F, 1000-00{i} Lisboa'
-      sql_statements.append(f"INSERT INTO enfermeiro (nif, nome, telefone, morada, nome_clinica) VALUES ('{nif}', '{nome}', '{telefone}', '{morada}', '{clinica}');")
-      enfermeiro_id += 1
-  return sql_statements
+      morada = moradas[clinicas.index(clinica)][0].replace('%', str(moradas[clinicas.index(clinica)][1]))
+      moradas[clinicas.index(clinica)][1] += 1
+      enfermeiros.append({
+        'nif': str(nif),
+        'nome': nomes.pop(random.randint(0, len(nomes) - 1)),
+        'telefone': str(telefone),
+        'morada': morada,
+        'nome_clinica': clinica['nome']
+      })
+      nif += random.randint(1, 35000)
+      telefone += random.randint(1, 20000)
+  return enfermeiros
 
 def generate_medicos(especialidades):
-  sql_statements = []
-  medico_id = 1
+  medicos = []
+  global nif
+  global telefone
   for especialidade in especialidades:
-    for i in range(20 if especialidade == 'clínica geral' else 8):
-      nif = str(medico_id).zfill(9)
-      nome = f'Medico {medico_id}'
-      telefone = f'92000000{i}'
-      morada = f'Rua G, 1000-00{i} Lisboa'
-      sql_statements.append(f"INSERT INTO medico (nif, nome, telefone, morada, especialidade) VALUES ('{nif}', '{nome}', '{telefone}', '{morada}', '{especialidade}');")
-      medico_id += 1
-  return sql_statements
+    for _ in range(20 if especialidade == 'clínica geral' else 8):
+      i = random.randint(0, len(moradas) - 1)
+      morada = moradas[i][0].replace('%', str(moradas[i][1]))
+      moradas[i][1] += 1
+      medicos.append({
+        'nif': str(nif),
+        'nome': nomes.pop(random.randint(0, len(nomes) - 1)),
+        'telefone': str(telefone),
+        'morada': morada,
+        'especialidade': especialidade
+      })
+      nif += random.randint(1, 35000)
+      telefone += random.randint(1, 20000)
+  return medicos
 
 def generate_trabalha(medicos, clinicas):
-  sql_statements = []
-  dias_semana = [0, 1, 2, 3, 4, 5, 6]  # 0 = domingo, 6 = sábado
-  for clinica in clinicas:
+  while True:
+    trabalha = []
+    dias_semana = [i for i in range(1,8)]
+    for dia in dias_semana:
+      # Lista de médicos disponíveis neste dia
+      medicos_dia = medicos.copy()
+      for clinica in clinicas:
+        # Cada clínica tem 8 médicos a trabalhar por dia
+        medicos_clinica = random.sample(medicos_dia, 8)
+        # Remover médicos que já estão a trabalhar neste dia
+        medicos_dia = [m for m in medicos_dia if m not in medicos_clinica]
+        for medico in medicos_clinica:
+          trabalha.append({
+            'nif': medico['nif'],
+            'nome': clinica['nome'],
+            'dia_da_semana': dia
+          })
+    # Verificar se todos os médicos têm pelo menos 2 dias de trabalho em diferentes clínicas
+    valid = True
     for medico in medicos:
-      dias_trabalho = random.sample(dias_semana, 2)
-      for dia in dias_trabalho:
-        sql_statements.append(f"INSERT INTO trabalha (nif, nome, dia_da_semana) VALUES ('{medico}', '{clinica}', {dia});")
-  return sql_statements
+      _clinicas = [t['nome'] for t in trabalha if t['nif'] == medico['nif']]
+      if len(_clinicas) < 2:
+        invalid = False
+    if valid: break
+  return trabalha
 
 def generate_pacientes(num_pacientes):
-  sql_statements = []
+  pacientes = []
+  global nif
+  global telefone
+  ssn = 10000000000
   for paciente_id in range(1, num_pacientes + 1):
-    ssn = str(paciente_id).zfill(11)
-    nif = str(paciente_id).zfill(9)
-    nome = f'Paciente {paciente_id}'
-    telefone = f'93000000{paciente_id % 10}'
-    morada = f'Rua H, 1000-00{paciente_id % 10} Lisboa'
-    data_nasc = (datetime.date(1980, 1, 1) + datetime.timedelta(days=paciente_id % 365)).isoformat()
-    sql_statements.append(f"INSERT INTO paciente (ssn, nif, nome, telefone, morada, data_nasc) VALUES ('{ssn}', '{nif}', '{nome}', '{telefone}', '{morada}', '{data_nasc}');")
-  return sql_statements
+    i = random.randint(0, len(moradas) - 1)
+    morada = moradas[i][0].replace('%', str(moradas[i][1]))
+    moradas[i][1] += 1
+    data_nasc = datetime.date(random.randint(1950, 2006), random.randint(1, 12), random.randint(1, 28)).isoformat()
+    pacientes.append({
+      'ssn': str(ssn),
+      'nif': str(nif),
+      'nome': nomes.pop(random.randint(0, len(nomes) - 1)),
+      'telefone': str(telefone),
+      'morada': morada,
+      'data_nasc': data_nasc
+    })
+    nif += random.randint(1, 35000)
+    telefone += random.randint(1, 20000)
+    ssn += random.randint(1, 1000000)
+  return pacientes
 
-def generate_consultas(num_consultas, pacientes, medicos, clinicas):
-  sql_statements = []
-  consulta_id = 1
+def generate_consultas(pacientes, trabalha, clinicas):
+  consultas = []
+  global nif
+  global telefone
+  consulta_id = 0
+  codigo_sns = 100000000000
   start_date = datetime.date(2023, 1, 1)
   end_date = datetime.date(2024, 12, 31)
-  date_range = (end_date - start_date).days
+  current_date = start_date
+  while current_date <= end_date:
+    pacientes_hoje = pacientes.copy()
+    for clinica in clinicas:
+      dia_da_semana = current_date.weekday() + 1
+      medicos_clinica = [t['nif'] for t in trabalha if t['nome'] == clinica['nome'] and t['dia_da_semana'] == dia_da_semana]
+      horas = [f'{str(i).zfill(2)}:{j}:00' for i in range(8, 12) for j in ("00", "30")]
+      horas += [f'{str(i).zfill(2)}:{j}:00' for i in range(14, 18) for j in ("00", "30")]
+      horas += ['13:00:00', '19:00:00']
+      for medico_nif in medicos_clinica:
+        # 3 consultas por médico garante que há pelo menos 
+        # 21 consultas por dia nesta clínica
+        for hora in random.sample(horas, random.randint(3,4)):
+          consultas.append({
+            'id': consulta_id,
+            'ssn': pacientes_hoje.pop(random.randint(0, len(pacientes_hoje) - 1))['ssn'],
+            'nif': medico_nif,
+            'nome': clinica['nome'],
+            'data': current_date.isoformat(),
+            'hora': hora,
+            'codigo_sns': str(codigo_sns).zfill(12)
+          })
+          consulta_id += random.randint(1, 3)
+          codigo_sns += random.randint(1, 8000000)
+    current_date += datetime.timedelta(days=1)
+  return consultas
 
-  for clinica in clinicas:
-    for day in range(date_range):
-      data_consulta = (start_date + datetime.timedelta(days=day)).isoformat()
-      for hour in range(8, 18):
-        for half_hour in [0, 30]:
-          hora_consulta = f'{hour:02d}:{half_hour:02d}:00'
-          for i in range(20):
-            paciente = random.choice(pacientes)
-            medico = random.choice(medicos)
-            codigo_sns = str(consulta_id).zfill(12)
-            sql_statements.append(f"INSERT INTO consulta (ssn, nif, nome, data, hora, codigo_sns) VALUES ('{paciente}', '{medico}', '{clinica}', '{data_consulta}', '{hora_consulta}', '{codigo_sns}');")
-            consulta_id += 1
-  return sql_statements
+medicamentos = ['Acetorphine', 'Acetyldihydrocodeine', 'Adinazolam', 'Alfentanil', 'Allobarbital ', 'Allylamine ', 'Allylprodine', 'Alphacetylmethadol', 'Alphameprodine', 'Alphamethadol', 'Methylfentanyl', 'Alphaprodine', 'Alphenal ', 'Alprazolam', 'Amineptine', 'Aminorex', 'Amphetamine', 'Amobarbital ', 'Anhydroecgonine', 'Anileridine', 'Aprobarbital ', 'Atamestane', 'Barbital ', 'Barbituric acid', 'Benzethidine', 'Benzoylecgonine', 'Benzphetamine', 'Benzylamine', 'Benzylmorphine ', 'Betacetylmethadol', 'Betameprodine', 'Betamethadol', 'Betaprodine', 'Bezitramide', 'Bolandiol', 'Bolasterone', 'Bolazine', 'Boldenone', 'Boldione', 'Bolenol', 'Bolmantalate', 'Bromazepam', 'Bromazolam', 'Bromophenethylamine', 'Brotizolam', 'Bufotenine ', 'Buprenorphine', 'Butabarbital ', 'Butalbital', 'Butallylonal', 'Butethal ', 'Calusterone', 'Camazepam', 'Cannabinol', 'Cannabinol derivatives ', 'Cannabis', 'Sativex', 'Carfentanyl', 'Cathinone', 'CBPMs', 'Chlordiazepoxide', 'Chloromethamphetamine', 'Chloroamphetamine', 'Chlorphentermine', 'Chlorophenethylamine', 'Chorionic gonadotrophin ', 'Clenbuterol', 'Clobazam', 'Clonazepam', 'Clonazolam', 'Clonitazene', 'Clorazepic acid', 'Clostebol', 'Clotiazepam', 'Cloxazolam', 'Coca leaf', 'Cocaethylene ', 'Cocaine', 'Codeine', 'Cyclobarbital ', 'Cyclopentobarbital ', 'Cyclopropylmethylamine', 'Danazol', 'Delorazepam', 'Deschloroetizolam', 'Desomorphine', 'Desoxymethyltestosterone', 'Desoxypipradrol ', 'Dextromoramide', 'Dextropropoxyphene', 'Diamorphine ', 'Diampromide', 'Diazepam', 'Diclazepam', 'Diethylpropion', 'Diethylthiambutene', 'Difenoxin', 'Dihydrocodeine', 'Dimethylamine', 'Dihydroetorphine', 'Dihydromorphine', 'Dimenoxadole', 'Dimepheptanol', 'Dimethylthiambutene', 'Dioxaphetyl butyrate', 'Diphenoxylate', 'Diphenylprolinol ', 'Dipipanone', 'Dronabinol', 'Drotebanol ', 'Drostanolone', 'Ecgonine', 'Enestebol', 'Epidyolex', 'Epitiostanol', 'Estazolam', 'Ethchlorvynol', 'Ethinamate', 'Ethyl loflazepate', 'Ethylmethylthiambutene', 'Ethylmorphine ', 'Ethylnaphthidate', 'Ethyloestrenol', 'Ethylphenidate', 'Eticyclidine', 'Etizolam', 'Etonitazene', 'Etorphine', 'Etoxeridine', 'Etryptamine', 'Fencamfamin', 'Fenethylline', 'Fenproporex', 'Fentanyl', 'Flualprazolam', 'Flubromazepam', 'Flubromazolam', 'Fludiazepam', 'Flunitrazepam', 'Flunitrazolam', 'Fluorophenethylamine', 'Fluoxymesterone', 'Flurazepam', 'Fonazepam', 'Formebolone', 'Fungus  which contains psilocin or an ester of psilocin', 'Furazabol', 'Furethidine', 'Gestrinone', 'Glutethimide', 'Halazepam', 'Haloxazolam', 'Heptobarbital ', 'Hexethal', 'Homoveratrylamine ', 'Hydroxybenzoylecgonine', 'Hydroxycocaine', 'Hydrocodone ', 'Hydromorphinol ', 'Hydromorphone', 'Hydroxypethidine', 'Isomethadone', 'Isopropylphenidate', 'Ketamine', 'Ketazolam', 'Ketobemidone', 'Khat', 'Lefetamine', 'Levomethorphan', 'Levomoramide', 'Levophenacylmorphan', 'Lisdexamphetamine', 'Lofentanil', 'Loprazolam', 'Lorazepam', 'Lormetazepam', 'Lysergamide', 'Lysergic acid diethylamide ', 'Lysergide ', 'Mazindol', 'Mebolazine', 'Meclonazepam', 'Mecloqualone', 'Medazepam', 'Mefenorex', 'Mephentermine', 'Mepitiostane', 'Meprobamate', 'Mesabolone', 'Mescaline', 'Mesocarb', 'Mestanolone', 'Metazocine', 'Mesterolone', 'Methadone', 'Methadyl acetate', 'Methylamphetamine', 'Methylmorphenate', 'Methylnaphthidate', 'Methandienone', 'Methandriol', 'Methaqualone', 'Methcathinone ', 'Methenolone', 'Methoxyphenethylamine', 'Methyldesorphine', 'Methyldihydromorphine ', 'Methylecgonine', 'Methylenedioxyamphetamine ', 'Methylenedioxyethylamphetamine ', 'Methylenedioxypyrovalerone ', 'Methylphenidate', 'Methylphenobarbital ', 'Methyltestosterone', 'Methyprylone', 'Metizolam', 'Metopon', 'Metribolone', 'Mibolerone', 'Midazolam', 'Morpheridine', 'Morphine', 'Morphine methobromide ', 'Myrophine', 'Nabilone', 'Nandrolone', 'Napthylpyrovalerone ', 'Nealbarbitone', 'Nicocodine', 'Nicodicodine ', 'Nicomorphine ', 'Nifoxipam', 'Nimetazepam', 'Nitrazepam', 'Nitrazolam', 'Noracymethadol', 'Norboletone', 'Norclostebol', 'Norcocaine', 'Norcodeine', 'Nordazepam', 'Norethandrolone', 'Norfludiazepam', 'Norlevorphanol', 'Normethadone', 'Normorphine', 'Norpethidine ', 'Norpipanone', 'Opium', 'Oripavine', 'Ovandrotone', 'Oxabolone', 'Oxandrolone', 'Oxazepam', 'Oxazolam', 'Oxycodone', 'Oxymesterone', 'Oxymetholone', 'Oxymorphone', 'Pemoline', 'Pentazocine', 'Pentobarbital ', 'Pethidine ', 'Phenadoxone', 'Phenampromide', 'Phenazocine', 'Phencyclidine ', 'Phendimetrazine', 'Phenmetrazine', 'Phenobarbital ', 'Phenomorphan', 'Phenoperidine', 'Phentermine', 'Pholcodine ', 'Piminodine', 'Pinazepam', 'Pipradrol', 'Piritramide', 'Poppy straw ', 'Prasterone ', 'Prazepam', 'Probarbital ', 'Proheptazine', 'Propallylonal', 'Properidine ', 'Propetandrol', 'Propiram', 'Propylbenzoylecgonine', 'Propylphenidate', 'Prostanozol', 'Proxibarbital ', 'Psilocin', 'Pyrazolam', 'Pyrovalerone', 'Quinalbarbital ', 'Quinbolone', 'Racemethorphan', 'Racemoramide', 'Racemorphan', 'Remifentanil', 'Rolicyclidine', 'Roxibolone', 'Secbutobarbital ', 'Silandrone', 'Somatotropin', 'Somatrem', 'Somatropin', 'Stanolone', 'Stanozolol', 'Stenbolone', 'Sufentanil', 'Talbutal', 'Tapentadol', 'Temazepam', 'Tenocyclidine', 'Testosterone', 'Tetrahydrocannabinol ', 'Tetrahydrogestrinone', 'Tetrazepam', 'Thebacon ', 'Thebaine', 'Thiomesterone', 'Tilidine', 'Tramadol', 'Trenbolone', 'Triazolam', 'Trimeperidine', 'Vinbarbital ', 'Vinylbital ', 'Zaleplon', 'Zeranol', 'Zilpaterol', 'Zipeprol', 'Zolpidem', 'Zopiclone']
 
 def generate_receitas(consultas):
   receitas = []
   for consulta in consultas:
     if random.random() < 0.8:
-      for j in range(random.randint(1, 6)):
-        quantidade = random.randint(1, 3)
-        medicamento = random.choice(medicamentos)
-        receitas.append(f"INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES ('{consulta}', '{medicamento}', {quantidade});")
+      for medicamento in random.sample(medicamentos, random.randint(1, 6)):
+        receitas.append({
+          'codigo_sns': consulta['codigo_sns'],
+          'medicamento': medicamento,
+          'quantidade': random.randint(1, 3)
+        })
+    else: 
+      consulta['codigo_sns'] = 'NULL'
   return receitas
 
+sintomas_qualitativos = [
+  "Dor de cabeça", "Náusea", "Tontura", "Fadiga", "Febre", "Calafrios", "Sudorese", 
+  "Tosse", "Dor no peito", "Falta de ar", "Dor abdominal", "Diarreia", "Constipação", 
+  "Vômito", "Arrepios", "Perda de apetite", "Perda de peso", "Ganho de peso", 
+  "Erupção cutânea", "Coceira", "Inchaço", "Dores musculares", "Dores articulares", 
+  "Palpitações", "Ansiedade", "Depressão", "Confusão", "Insônia", "Sonolência", 
+  "Fraqueza", "Amarelamento da pele", "Olhos vermelhos", "Dor de garganta", 
+  "Rouquidão", "Congestão nasal", "Nariz escorrendo", "Dificuldade para engolir", 
+  "Perda de olfato", "Perda de paladar", "Zumbido nos ouvidos", "Visão turva", 
+  "Olhos secos", "Lacrimejamento", "Dor de dente", "Sangramento nas gengivas", 
+  "Cãibras", "Dor nas costas", "Dor pélvica", "Dor nas pernas", "Falta de coordenação"
+]
+
+sintomas_quantitativos = [
+  {"sintoma": "Batimentos cardíacos por minuto", "min": 60, "max": 100},
+  {"sintoma": "Pressão arterial sistólica", "min": 90, "max": 160},
+  {"sintoma": "pressão arterial diastólica", "min": 60, "max": 140},
+  {"sintoma": "Nível de glicose no sangue (mg/dL)", "min": 70, "max": 140},
+  {"sintoma": "Temperatura corporal (°C)", "min": 36.1, "max": 37.2},
+  {"sintoma": "Saturação de oxigênio (%)", "min": 95, "max": 100},
+  {"sintoma": "Frequência respiratória (respirações por minuto)", "min": 12, "max": 20},
+  {"sintoma": "Índice de massa corporal (IMC)", "min": 18.5, "max": 24.9},
+  {"sintoma": "Colesterol total (mg/dL)", "min": 125, "max": 200},
+  {"sintoma": "Triglicerídeos (mg/dL)", "min": 50, "max": 150},
+  {"sintoma": "Nível de creatinina no sangue (mg/dL)", "min": 0.6, "max": 1.3},
+  {"sintoma": "Volume urinário (mL por dia)", "min": 800, "max": 2000},
+  {"sintoma": "Hemoglobina (g/dL)", "min": 13.8, "max": 17.2},
+  {"sintoma": "Hematócrito (%)", "min": 40.7, "max": 50.3},
+  {"sintoma": "Número de leucócitos (milhões por mL)", "min": 4, "max": 11},
+  {"sintoma": "Número de plaquetas (milhões por mL)", "min": 150, "max": 450},
+  {"sintoma": "pH sanguíneo", "min": 7.35, "max": 7.45},
+  {"sintoma": "Nível de cálcio no sangue (mg/dL)", "min": 8.5, "max": 10.5},
+  {"sintoma": "Nível de sódio no sangue (mEq/L)", "min": 135, "max": 145},
+  {"sintoma": "Nível de potássio no sangue (mEq/L)", "min": 3.5, "max": 5.0}
+]
+
 def generate_observacoes(consultas):
-  sql_statements = []
-  sintomas = ['Febre', 'Tosse', 'Dor de cabeça', 'Cansaço', 'Dificuldade em respirar']
-  metricas = ['Pressão arterial', 'Temperatura corporal', 'Frequência cardíaca']
-  
+  observacoes = []
   for consulta in consultas:
-    for k in range(random.randint(1, 5)):
-      parametro = random.choice(sintomas)
-      sql_statements.append(f"INSERT INTO observacao (id, parametro) VALUES ('{consulta}', '{parametro}');")
-    for l in range(random.randint(0, 3)):
-      parametro = random.choice(metricas)
-      valor = random.uniform(50, 150)
-      sql_statements.append(f"INSERT INTO observacao (id, parametro, valor) VALUES ('{consulta}', '{parametro}', {valor});")
-  return sql_statements
+    # 1 a 5 sintomas qualitativos
+    for sintoma in random.sample(sintomas_qualitativos, random.randint(1, 5)):
+      observacoes.append({
+        'id': consulta['id'],
+        'parametro': sintoma,
+        'valor': 'NULL'
+      })
+    # 0 a 3 sintomas quantitativos
+    for sintoma in random.sample(sintomas_quantitativos, random.randint(0, 3)):
+      valor = random.uniform(sintoma['min'], sintoma['max'])
+      observacoes.append({
+        'id': consulta['id'],
+        'parametro': sintoma['sintoma'],
+        'valor': f'{valor:.2f}'
+      })
+  return observacoes
 
 def main():
-  clinicas = [
-    'Centro Clinico dos Anjos', 
-    'Clinica Sorriso Famoso', 
-    'Clinica Dentejo', 
-    'Clinica Joaquim Chaves Sintra', 
-    'Clinica Sabeanas'
+  sql_statements = [
+    "-- Eliminar dados anteriores",
+    "TRUNCATE TABLE receita, observacao, consulta, trabalha, paciente, medico, enfermeiro, clinica RESTART IDENTITY;"
   ]
-  especialidades = ['clínica geral', 'ortopedia', 'cardiologia', 'dermatologia', 'neurologia', 'pediatria']
+  clinicas = generate_clinicas()
+  medicos = generate_medicos(especialidades)
+  trabalha = generate_trabalha(medicos, clinicas)
+  pacientes = generate_pacientes(5000)
+  consultas = generate_consultas(pacientes, trabalha, clinicas)
+  receitas = generate_receitas(consultas)
+  observacoes = generate_observacoes(consultas)
+  sql_statements.append(dict_to_sql('clinica', clinicas))
+  sql_statements.append(dict_to_sql('enfermeiro', generate_enfermeiros(clinicas)))
+  sql_statements.append(dict_to_sql('medico', medicos))
+  sql_statements.append(dict_to_sql('trabalha', trabalha))
+  sql_statements.append(dict_to_sql('paciente', pacientes))
+  sql_statements.append(dict_to_sql('consulta', consultas))
+  sql_statements.append(dict_to_sql('receita', receitas))
+  sql_statements.append(dict_to_sql('observacao', observacoes))
+  write_to_file('./data/populate.sql', sql_statements)
 
-  sql_statements = []
-  sql_statements += generate_clinicas()
-  sql_statements += generate_enfermeiros(clinicas)
-  sql_statements += generate_medicos(especialidades)
-  medicos = [str(i).zfill(9) for i in range(1, 61)]
-  sql_statements += generate_trabalha(medicos, clinicas)
-  pacientes = [str(i).zfill(11) for i in range(1, 5001)]
-  sql_statements += generate_pacientes(5000)
-  consultas = [str(i).zfill(12) for i in range(1, 100001)]  # Número de consultas ajustado para ser realista
-  sql_statements += generate_consultas(100000, pacientes, medicos, clinicas)
-  sql_statements += generate_receitas(consultas)
-  sql_statements += generate_observacoes(consultas)
-
-  with open('populate_db.sql', 'w') as f:
-    for statement in sql_statements:
-      f.write(statement + '\n')
-
-if __name__ == "__main__":
+if __name__ == '__main__':
   main()
