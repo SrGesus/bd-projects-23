@@ -27,7 +27,7 @@ def write_to_file(filename, sql_statements):
   with open(filename, 'w') as f:
     for line in sql_statements:
       f.write(line + '\n')
-      print(line)
+      # print(line)
 
 def generate_clinicas():
   return [
@@ -142,9 +142,8 @@ def generate_consultas(pacientes, trabalha, clinicas):
     for clinica in clinicas:
       dia_da_semana = current_date.weekday() + 1
       medicos_clinica = [t['nif'] for t in trabalha if t['nome'] == clinica['nome'] and t['dia_da_semana'] == dia_da_semana]
-      horas = [f'{str(i).zfill(2)}:{j}:00' for i in range(8, 12) for j in ("00", "30")]
-      horas += [f'{str(i).zfill(2)}:{j}:00' for i in range(14, 18) for j in ("00", "30")]
-      horas += ['13:00:00', '19:00:00']
+      horas = [f'{str(i).zfill(2)}:{j}:00' for i in range(8, 13) for j in ("00", "30")]
+      horas += [f'{str(i).zfill(2)}:{j}:00' for i in range(14, 19) for j in ("00", "30")]
       for medico_nif in medicos_clinica:
         # 3 consultas por médico garante que há pelo menos 
         # 21 consultas por dia nesta clínica
@@ -195,7 +194,7 @@ sintomas_qualitativos = [
 sintomas_quantitativos = [
   {"sintoma": "Batimentos cardíacos por minuto", "min": 60, "max": 100},
   {"sintoma": "Pressão arterial sistólica", "min": 90, "max": 160},
-  {"sintoma": "pressão arterial diastólica", "min": 60, "max": 140},
+  {"sintoma": "Pressão arterial diastólica", "min": 60, "max": 140},
   {"sintoma": "Nível de glicose no sangue (mg/dL)", "min": 70, "max": 140},
   {"sintoma": "Temperatura corporal (°C)", "min": 36.1, "max": 37.2},
   {"sintoma": "Saturação de oxigênio (%)", "min": 95, "max": 100},
