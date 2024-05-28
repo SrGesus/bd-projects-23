@@ -4,7 +4,7 @@ from logging.config import dictConfig
 import psycopg
 from flask import Flask, jsonify, request
 from psycopg.rows import namedtuple_row
-from datetime import datetime
+import datetime
 
 app = Flask(__name__)
 app.config.from_prefixed_env()
@@ -56,20 +56,24 @@ def medic_index(clinica, especialidade):
     FROM trabalha t 
     JOIN medico m USING(nif)
     WHERE t.nome = %s AND m.especialidade = %s;
+
     """
-    #data e hora ASC ou DESC?
-    data = datetime.today().strftime('%Y-%m-%d')
-    hora = datetime.today().strftime('%H:%M:%S')
+    # data = (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%Y-%m-%d')
+    # hora = (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M:%S')
+    data = datetime.datetime.now().strftime('%Y-%m-%d')
+    hora = datetime.datetime.now().strftime('%H:%M:%S')
     query_horarios = """
-    SELECT data, hora
-    FROM (
-        SELECT * FROM (SELECT DISTINCT hora FROM consulta) 
-        CROSS JOIN (SELECT DISTINCT data FROM consulta) 
-        WHERE data > %(data)s OR 
-        (data = %(data)s AND hora >= %(hora)s)
-        ORDER BY data, hora
-    ) AS t
-    WHERE EXTRACT(ISODOW FROM data) IN (
+    WITH RECURSIVE time_range AS (
+        SELECT %(data)s::date AS data, hora
+        FROM distinct_horas
+        UNION ALL
+        SELECT (data + INTERVAL '1 day')::date, hora
+        FROM time_range
+    )
+    SELECT data, hora 
+    FROM time_range AS t
+    WHERE (data > %(data)s OR hora > %(hora)s) AND
+    EXTRACT(ISODOW FROM data) IN (
         SELECT dia_da_semana
         FROM trabalha
         WHERE nif = %(nif)s AND nome = %(clinica)s

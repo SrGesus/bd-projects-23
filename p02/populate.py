@@ -62,8 +62,23 @@ def generate_medicos(especialidades):
   medicos = []
   global nif
   global telefone
-  for especialidade in especialidades:
-    for _ in range(20 if especialidade == 'clínica geral' else 8):
+  for _ in range(20):
+    i = random.randint(0, len(moradas) - 1)
+    morada = moradas[i][0].replace('%', str(moradas[i][1]))
+    moradas[i][1] += 1
+    medicos.append({
+      'nif': str(nif),
+      'nome': nomes.pop(random.randint(0, len(nomes) - 1)),
+      'telefone': str(telefone),
+      'morada': morada,
+      'especialidade': 'clínica geral'
+    })
+    nif += random.randint(1, 35000)
+    telefone += random.randint(1, 20000)
+  points = sorted(random.sample(range(1, 40), 5 - 1))
+  esp_n = [points[0]] + [points[i] - points[i - 1] for i in range(1, len(points))] + [40 - points[-1]]
+  for esp in range(5):
+    for _ in range(esp_n[esp]):
       i = random.randint(0, len(moradas) - 1)
       morada = moradas[i][0].replace('%', str(moradas[i][1]))
       moradas[i][1] += 1
@@ -72,7 +87,7 @@ def generate_medicos(especialidades):
         'nome': nomes.pop(random.randint(0, len(nomes) - 1)),
         'telefone': str(telefone),
         'morada': morada,
-        'especialidade': especialidade
+        'especialidade': especialidades[esp+1]
       })
       nif += random.randint(1, 35000)
       telefone += random.randint(1, 20000)
@@ -80,29 +95,30 @@ def generate_medicos(especialidades):
 
 def generate_trabalha(medicos, clinicas):
   while True:
-    trabalha = []
-    dias_semana = [i for i in range(1,8)]
-    for dia in dias_semana:
-      # Lista de médicos disponíveis neste dia
-      medicos_dia = medicos.copy()
-      for clinica in clinicas:
-        # Cada clínica tem 8 médicos a trabalhar por dia
-        medicos_clinica = random.sample(medicos_dia, 8)
-        # Remover médicos que já estão a trabalhar neste dia
-        medicos_dia = [m for m in medicos_dia if m not in medicos_clinica]
-        for medico in medicos_clinica:
-          trabalha.append({
-            'nif': medico['nif'],
-            'nome': clinica['nome'],
-            'dia_da_semana': dia
-          })
-    # Verificar se todos os médicos têm pelo menos 2 dias de trabalho em diferentes clínicas
     valid = True
+    trabalha = []
     for medico in medicos:
-      _clinicas = [t['nome'] for t in trabalha if t['nif'] == medico['nif']]
-      if len(_clinicas) < 2:
-        invalid = False
-    if valid: break
+      clinicas_medico_sample = random.sample(clinicas, random.randint(2,4))
+      clinicas_medico = [random.choice(clinicas_medico_sample)['nome'] for _ in range(7)]
+      while len(set(clinicas_medico)) < 2:
+        clinicas_medico = [random.choice(clinicas_medico_sample)['nome'] for _ in range(7)]
+      for i in range(7):
+        trabalha.append({
+          'nif': medico['nif'],
+          'nome': clinicas_medico[i],
+          'dia_da_semana': i+1
+        })
+    # Verificar que todas as clinicas têm pelo menos 8 médicos a trabalhar nesse dia da semana
+    for clinica in clinicas:
+      for dia in range(1, 8):
+        if len([t for t in trabalha if t['nome'] == clinica['nome'] and t['dia_da_semana'] == dia]) < 8:
+          print("Bruh")
+          valid = False
+          break
+        if not valid: 
+          break
+    if valid:
+      break
   return trabalha
 
 def generate_pacientes(num_pacientes):
@@ -254,6 +270,12 @@ def main():
   sql_statements.append(dict_to_sql('consulta', consultas))
   sql_statements.append(dict_to_sql('receita', receitas))
   sql_statements.append(dict_to_sql('observacao', observacoes))
+  sql_statements.append("""
+    DROP TABLE distinct_horas;
+    CREATE TABLE distinct_horas AS
+    SELECT DISTINCT hora
+    FROM consulta ORDER BY hora;
+  """)
   write_to_file('./data/populate.sql', sql_statements)
 
 if __name__ == '__main__':
