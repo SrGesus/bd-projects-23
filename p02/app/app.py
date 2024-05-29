@@ -58,13 +58,10 @@ def medic_index(clinica, especialidade):
     WHERE t.nome = %s AND m.especialidade = %s;
 
     """
-    # data = (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%Y-%m-%d')
-    # hora = (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M:%S')
-    data = datetime.datetime.now().strftime('%Y-%m-%d')
-    hora = datetime.datetime.now().strftime('%H:%M:%S')
+    
     query_horarios = """
     WITH RECURSIVE time_range AS (
-        SELECT %(data)s::date AS data, hora
+        SELECT CURRENT_DATE::date AS data, hora
         FROM distinct_horas
         UNION ALL
         SELECT (data + INTERVAL '1 day')::date, hora
@@ -72,7 +69,7 @@ def medic_index(clinica, especialidade):
     )
     SELECT data, hora 
     FROM time_range AS t
-    WHERE (data > %(data)s OR hora > %(hora)s) AND
+    WHERE (data > CURRENT_DATE OR hora > CURRENT_TIMESTAMP::time) AND
     EXTRACT(ISODOW FROM data) IN (
         SELECT dia_da_semana
         FROM trabalha
@@ -95,8 +92,7 @@ def medic_index(clinica, especialidade):
             for medico in medicos:
                 # Buscar horários para cada médico
                 cur.execute(query_horarios, {
-                    "nif": medico.nif, "clinica": clinica, 
-                    "data": data, "hora": hora
+                    "nif": medico.nif, "clinica": clinica,
                 })
                 horarios = cur.fetchall()
                 result[medico.nome] = [(horario.data.strftime('%Y-%m-%d'), horario.hora.strftime('%H:%M:%S')) for horario in horarios]
@@ -104,7 +100,36 @@ def medic_index(clinica, especialidade):
     return jsonify(result)
 
 
-@app.route("/a/<clinica>/cancelar/", methods=("POST",))
+@app.route("/a/<clinica>/", methods=("GET",))
+def consultas_get(clinica):
+    """Lista próximas consultas marcadas na clínica especificada."""
+
+    query = """
+    SELECT c.ssn, c.nif, c.data, c.hora
+    FROM consulta c
+    WHERE c.nome = %s 
+    AND (c.data > CURRENT_DATE)
+    OR (c.data = CURRENT_DATE AND c.hora >= CURRENT_TIMESTAMP::time)
+    ORDER BY c.data, c.hora
+    LIMIT 20;
+    """
+
+    results = []
+    with psycopg.connect(conninfo=DATABASE_URL) as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(query, (clinica,))
+            consultas = cur.fetchall()
+            log.debug(f"Found {cur.rowcount} rows for clinic {clinica}.")
+            for consulta in consultas:
+                results.append({
+                    "paciente": consulta.ssn,
+                    "medico": consulta.nif,
+                    "data": consulta.data.strftime('%Y-%m-%d'),
+                    "hora": consulta.hora.strftime('%H:%M:%S'),
+                })
+    return jsonify(results)
+
+@app.route("/a/<clinica>/cancelar/", methods=("DELETE",))
 def consulta_delete(clinica):
     """Cancela uma marcação de consulta que ainda não se realizou na clínica."""
     
@@ -113,9 +138,15 @@ def consulta_delete(clinica):
     medico = request.json.get('medico')
     data = request.json.get('data')  
     hora = request.json.get('hora')  
-    
-    if not paciente or not medico or not data or not hora:
-        return jsonify({"error": "Parâmetros em falta"}), 400
+
+    if not paciente:
+        return jsonify({"error": "Parâmetro paciente em falta"}), 400
+    if not medico:
+        return jsonify({"error": "Parâmetro medico em falta"}), 400
+    if not data:
+        return jsonify({"error": "Parâmetro data em falta"}), 400
+    if not hora:
+        return jsonify({"error": "Parâmetro hora em falta"}), 400
     
     delete_query = """
     DELETE FROM consulta
