@@ -6,10 +6,16 @@ meta {
 
 delete {
   url: http://localhost:8080/a/Centro Clinico dos Anjos/cancelar
-  body: none
+  body: json
   auth: none
 }
 
-query {
-  : 
+body:json {
+  {
+      "data": "2024-05-29",
+      "hora": "15:00:00",
+      "medico": "200523021",
+      "paciente": "10734317812"
+  }
+  
 }
