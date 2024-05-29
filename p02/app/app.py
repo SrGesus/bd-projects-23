@@ -130,6 +130,43 @@ def consultas_get(clinica):
                 })
     return jsonify(results)
 
+@app.route("/a/<clinica>/registar/", methods=("POST",))
+def consultas_regista(clinica):
+    # Receber os dados da requisição
+    paciente = request.json.get('paciente')
+    medico = request.json.get('medico')
+    data = request.json.get('data')  
+    hora = request.json.get('hora')  
+
+    if not paciente:
+        return jsonify({"error": "Parâmetro paciente em falta"}), 400
+    if not medico:
+        return jsonify({"error": "Parâmetro medico em falta"}), 400
+    if not data:
+        return jsonify({"error": "Parâmetro data em falta"}), 400
+    if data and not re.match(r"\d{4}-\d{2}-\d{2}", data):
+        return jsonify({"error": "Formato de data inválido"}), 400
+    if not hora:
+        return jsonify({"error": "Parâmetro hora em falta"}), 400
+    if hora and not re.match(r"\d{2}:\d{2}:\d{2}", hora):
+        return jsonify({"error": "Bad Request: Formato de hora inválido"}), 400
+    
+    regista_query = """
+    INSERT INTO consulta VALUES( , %s, %s, %s, %s, %s);
+    """
+
+    with psycopg.connect(conninfo=DATABASE_URL) as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(regista_query, (paciente, medico, clinica, data, hora))
+            if cur.rowcount == 0:
+                return jsonify({"error": "Marcação não registada"}), 404
+            conn.commit()
+            log.debug(f"Marcação cancelada: paciente {paciente}, medico {medico}, clinica {clinica}, data {data}, hora {hora}")
+    
+    return jsonify({"success": "Marcação registada com sucesso"}), 200
+
+
+
 @app.route("/a/<clinica>/cancelar/", methods=("DELETE",))
 def consulta_delete(clinica):
     """Cancela uma marcação de consulta que ainda não se realizou na clínica."""
@@ -153,16 +190,33 @@ def consulta_delete(clinica):
     if hora and not re.match(r"\d{2}:\d{2}:\d{2}", hora):
         return jsonify({"error": "Bad Request: Formato de hora inválido"}), 400
     
-    delete_query = """
-    DELETE FROM consulta
+    receita_query = """
+    SELECT codigo_sns, id FROM consulta 
     WHERE ssn = %s AND nif = %s AND nome = %s AND data = %s AND hora = %s;
+    """
+
+    delete_receita_query = """
+    DELETE FROM receita
+    WHERE codigo_sns = %s;
+    """
+    delete_observacao_query= """
+    DELETE FROM observacao
+    WHERE id = %s"""
+
+    delete_consulta_query = """
+    DELETE FROM consulta
+    WHERE id = %s;
     """
     
     with psycopg.connect(conninfo=DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            cur.execute(delete_query, (paciente, medico, clinica, data, hora))
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(receita_query, (paciente, medico, clinica, data, hora))
             if cur.rowcount == 0:
                 return jsonify({"error": "Marcação não encontrada"}), 404
+            receita = cur.fetchone()
+            cur.execute(delete_receita_query, (receita.codigo_sns,))
+            cur.execute(delete_observacao_query, (receita.id,))
+            cur.execute(delete_consulta_query, (receita.id,))
             conn.commit()
             log.debug(f"Marcação cancelada: paciente {paciente}, medico {medico}, clinica {clinica}, data {data}, hora {hora}")
     
