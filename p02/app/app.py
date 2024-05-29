@@ -4,7 +4,6 @@ from logging.config import dictConfig
 import psycopg
 from flask import Flask, jsonify, request
 from psycopg.rows import namedtuple_row
-import datetime
 
 app = Flask(__name__)
 app.config.from_prefixed_env()
