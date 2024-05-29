@@ -173,7 +173,7 @@ def generate_consultas(pacientes, trabalha, clinicas):
             'hora': hora,
             'codigo_sns': str(codigo_sns).zfill(12)
           })
-          consulta_id += random.randint(1, 3)
+          consulta_id += 1
           codigo_sns += random.randint(1, 8000000)
     current_date += datetime.timedelta(days=1)
   return consultas
