@@ -210,7 +210,7 @@ sintomas_qualitativos = [
 sintomas_quantitativos = [
   {"sintoma": "Batimentos cardíacos por minuto", "min": 60, "max": 100},
   {"sintoma": "Pressão arterial sistólica", "min": 90, "max": 160},
-  {"sintoma": "Pressão arterial diastólica", "min": 60, "max": 140},
+  {"sintoma": "Pressão arterial diastólica", "min": 55, "max": 120},
   {"sintoma": "Nível de glicose no sangue (mg/dL)", "min": 70, "max": 140},
   {"sintoma": "Temperatura corporal (°C)", "min": 36.1, "max": 37.2},
   {"sintoma": "Saturação de oxigênio (%)", "min": 95, "max": 100},
@@ -242,7 +242,7 @@ def generate_observacoes(consultas):
       })
     # 0 a 3 sintomas quantitativos
     for sintoma in random.sample(sintomas_quantitativos, random.randint(0, 3)):
-      valor = random.uniform(sintoma['min'], sintoma['max'])
+      valor = random.normalvariate((sintoma['min'] + sintoma['max']) / 2, (sintoma['max'] - sintoma['min']) / 6)
       observacoes.append({
         'id': consulta['id'],
         'parametro': sintoma['sintoma'],
