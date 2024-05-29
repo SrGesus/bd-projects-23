@@ -130,6 +130,7 @@ def consultas_get(clinica):
                 })
     return jsonify(results)
 
+
 @app.route("/a/<clinica>/registar/", methods=("POST",))
 def consultas_regista(clinica):
     # Receber os dados da requisição
@@ -151,20 +152,54 @@ def consultas_regista(clinica):
     if hora and not re.match(r"\d{2}:\d{2}:\d{2}", hora):
         return jsonify({"error": "Bad Request: Formato de hora inválido"}), 400
     
+    verifica_data_query = """SELECT 1 
+    FROM distinct_horas 
+    WHERE (
+    (hora > CURRENT_TIMESTAMP::time AND %(data)s=CURRENT_DATE) 
+    OR %(data)s>CURRENT_DATE
+    ) AND (hora = %(hora)s);
+    """
+
+    verifica_paciente_query = """
+    SELECT ssn FROM paciente 
+    WHERE ssn = %s;
+    """
+
+    verifica_medico_query = """
+    SELECT nif FROM medico
+    WHERE nif = %s;
+    """
+
     regista_query = """
-    INSERT INTO consulta VALUES( , %s, %s, %s, %s, %s);
+    INSERT INTO consulta (ssn, nif, nome, data, hora) VALUES(%s, %s, %s, %s, %s);
     """
 
     with psycopg.connect(conninfo=DATABASE_URL) as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
-            cur.execute(regista_query, (paciente, medico, clinica, data, hora))
+            cur.execute(verifica_paciente_query, (paciente,))
             if cur.rowcount == 0:
-                return jsonify({"error": "Marcação não registada"}), 404
+                return jsonify({"error": "Paciente não encontrado"}), 404
+            cur.fetchall()
+            cur.execute(verifica_medico_query, (medico,))
+            if cur.rowcount == 0:
+                return jsonify({"error": "Médico não encontrado"}), 404
+            cur.fetchall()
+            cur.execute(verifica_data_query, {
+                    "data": data, "hora": hora,
+                })
+            if cur.rowcount == 0:
+                return jsonify({"error": "A data e hora têm que ser futuras"}), 400
+            cur.fetchall()
+            try:
+                cur.execute(regista_query, (paciente, medico, clinica, data, hora))
+            except psycopg.errors.RaiseException as e:
+                return jsonify({"error": "O médico não está a trabalhar nesta clínica nessa data"}), 400
+            except psycopg.errors.UniqueViolation as e:
+                return jsonify({"error": "O paciente ou o médico já têm uma consulta nesta data e hora"}), 400
             conn.commit()
-            log.debug(f"Marcação cancelada: paciente {paciente}, medico {medico}, clinica {clinica}, data {data}, hora {hora}")
+            log.debug(f"Marcação registada: paciente {paciente}, medico {medico}, clinica {clinica}, data {data}, hora {hora}")
     
     return jsonify({"success": "Marcação registada com sucesso"}), 200
-
 
 
 @app.route("/a/<clinica>/cancelar/", methods=("DELETE",))
@@ -190,6 +225,14 @@ def consulta_delete(clinica):
     if hora and not re.match(r"\d{2}:\d{2}:\d{2}", hora):
         return jsonify({"error": "Bad Request: Formato de hora inválido"}), 400
     
+    verifica_data_query = """SELECT 1 
+    FROM distinct_horas 
+    WHERE (
+    (hora > CURRENT_TIMESTAMP::time AND %(data)s=CURRENT_DATE) 
+    OR %(data)s>CURRENT_DATE
+    ) AND (hora = %(hora)s);
+    """
+
     receita_query = """
     SELECT codigo_sns, id FROM consulta 
     WHERE ssn = %s AND nif = %s AND nome = %s AND data = %s AND hora = %s;
@@ -214,6 +257,11 @@ def consulta_delete(clinica):
             if cur.rowcount == 0:
                 return jsonify({"error": "Marcação não encontrada"}), 404
             receita = cur.fetchone()
+            cur.execute(verifica_data_query, {
+                    "data": data, "hora": hora,
+                })
+            if cur.rowcount == 0:
+                return jsonify({"error": "Só podes cancelar consultas futuras"}), 400
             cur.execute(delete_receita_query, (receita.codigo_sns,))
             cur.execute(delete_observacao_query, (receita.id,))
             cur.execute(delete_consulta_query, (receita.id,))
