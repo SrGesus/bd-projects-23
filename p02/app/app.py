@@ -4,6 +4,7 @@ from logging.config import dictConfig
 import psycopg
 from flask import Flask, jsonify, request
 from psycopg.rows import namedtuple_row
+import re
 
 app = Flask(__name__)
 app.config.from_prefixed_env()
@@ -14,6 +15,7 @@ log = app.logger
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@postgres/postgres")
 
 @app.route("/", methods=("GET",))
+@app.route("/c/", methods=("GET",))
 def clinic_index(): 
 
     query = """
@@ -144,8 +146,12 @@ def consulta_delete(clinica):
         return jsonify({"error": "Parâmetro medico em falta"}), 400
     if not data:
         return jsonify({"error": "Parâmetro data em falta"}), 400
+    if data and not re.match(r"\d{4}-\d{2}-\d{2}", data):
+        return jsonify({"error": "Formato de data inválido"}), 400
     if not hora:
         return jsonify({"error": "Parâmetro hora em falta"}), 400
+    if hora and not re.match(r"\d{2}:\d{2}:\d{2}", hora):
+        return jsonify({"error": "Bad Request: Formato de hora inválido"}), 400
     
     delete_query = """
     DELETE FROM consulta
