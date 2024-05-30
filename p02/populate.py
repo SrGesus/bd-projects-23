@@ -8,7 +8,14 @@ nomes = [f"{primeiro} {ultimo}" for primeiro in primeiros_nomes for ultimo in ul
 nif = 200000000
 telefone = 910000000
 moradas = [ ["Rua %, 1150-015 Lisboa", 1], ["Rua %, 1100-202 Lisboa", 1], ["Rua %, 2580-649 Carregado", 1], ["Rua %, 2635-018 Rio de Mouro", 1], ["Rua %, 2775-615 Carcavelos", 1]]
-especialidades = ['clínica geral', 'ortopedia', 'cardiologia', 'dermatologia', 'neurologia', 'oncologia']
+especialidades = [
+  {"nome": "clínica geral", "num_medicos": 20},
+  {"nome": "ortopedia", "num_medicos": 5},
+  {"nome": "cardiologia", "num_medicos": 25},
+  {"nome": "oncologia", "num_medicos": 5},
+  {"nome": "dermatologia", "num_medicos": 3},
+  {"nome": "neurologia", "num_medicos": 2},
+]
 
 def dict_to_sql(table_name, data):
   """Converts a list of dictionaries of the same type 
@@ -62,23 +69,8 @@ def generate_medicos(especialidades):
   medicos = []
   global nif
   global telefone
-  for _ in range(20):
-    i = random.randint(0, len(moradas) - 1)
-    morada = moradas[i][0].replace('%', str(moradas[i][1]))
-    moradas[i][1] += 1
-    medicos.append({
-      'nif': str(nif),
-      'nome': nomes.pop(random.randint(0, len(nomes) - 1)),
-      'telefone': str(telefone),
-      'morada': morada,
-      'especialidade': 'clínica geral'
-    })
-    nif += random.randint(1, 35000)
-    telefone += random.randint(1, 20000)
-  points = sorted(random.sample(range(1, 40), 5 - 1))
-  esp_n = [points[0]] + [points[i] - points[i - 1] for i in range(1, len(points))] + [40 - points[-1]]
-  for esp in range(5):
-    for _ in range(esp_n[esp]):
+  for esp in especialidades:
+    for _ in range(esp['num_medicos']):
       i = random.randint(0, len(moradas) - 1)
       morada = moradas[i][0].replace('%', str(moradas[i][1]))
       moradas[i][1] += 1
@@ -87,7 +79,7 @@ def generate_medicos(especialidades):
         'nome': nomes.pop(random.randint(0, len(nomes) - 1)),
         'telefone': str(telefone),
         'morada': morada,
-        'especialidade': especialidades[esp+1]
+        'especialidade': esp['nome']
       })
       nif += random.randint(1, 35000)
       telefone += random.randint(1, 20000)
@@ -137,7 +129,7 @@ def generate_pacientes(num_pacientes):
       'nome': nomes.pop(random.randint(0, len(nomes) - 1)),
       'telefone': str(telefone),
       'morada': morada,
-      'data_nasc': data_nasc
+      'data_nasc': data_nasc,
     })
     nif += random.randint(1, 35000)
     telefone += random.randint(1, 20000)
@@ -148,13 +140,16 @@ def generate_consultas(pacientes, trabalha, clinicas):
   consultas = []
   global nif
   global telefone
-  consulta_id = 0
+  consulta_id = 1
   codigo_sns = 100000000000
   start_date = datetime.date(2023, 1, 1)
   end_date = datetime.date(2024, 12, 31)
   current_date = start_date
+  counter = 0
+  pacientes_hoje = pacientes.copy()
   while current_date <= end_date:
-    pacientes_hoje = pacientes.copy()
+    if counter % 6 == 0:
+      pacientes_hoje = pacientes.copy()
     for clinica in clinicas:
       dia_da_semana = current_date.weekday() + 1
       medicos_clinica = [t['nif'] for t in trabalha if t['nome'] == clinica['nome'] and t['dia_da_semana'] == dia_da_semana]
@@ -163,7 +158,7 @@ def generate_consultas(pacientes, trabalha, clinicas):
       for medico_nif in medicos_clinica:
         # 3 consultas por médico garante que há pelo menos 
         # 21 consultas por dia nesta clínica
-        for hora in random.sample(horas, random.randint(3,4)):
+        for hora in random.sample(horas, random.randint(3, 20)):
           consultas.append({
             'id': consulta_id,
             'ssn': pacientes_hoje.pop(random.randint(0, len(pacientes_hoje) - 1))['ssn'],
@@ -174,17 +169,25 @@ def generate_consultas(pacientes, trabalha, clinicas):
             'codigo_sns': str(codigo_sns).zfill(12)
           })
           consulta_id += 1
-          codigo_sns += random.randint(1, 8000000)
+          codigo_sns += random.randint(1, 8000)
     current_date += datetime.timedelta(days=1)
+    counter += 1
   return consultas
 
-medicamentos = ['Acetorphine', 'Acetyldihydrocodeine', 'Adinazolam', 'Alfentanil', 'Allobarbital ', 'Allylamine ', 'Allylprodine', 'Alphacetylmethadol', 'Alphameprodine', 'Alphamethadol', 'Methylfentanyl', 'Alphaprodine', 'Alphenal ', 'Alprazolam', 'Amineptine', 'Aminorex', 'Amphetamine', 'Amobarbital ', 'Anhydroecgonine', 'Anileridine', 'Aprobarbital ', 'Atamestane', 'Barbital ', 'Barbituric acid', 'Benzethidine', 'Benzoylecgonine', 'Benzphetamine', 'Benzylamine', 'Benzylmorphine ', 'Betacetylmethadol', 'Betameprodine', 'Betamethadol', 'Betaprodine', 'Bezitramide', 'Bolandiol', 'Bolasterone', 'Bolazine', 'Boldenone', 'Boldione', 'Bolenol', 'Bolmantalate', 'Bromazepam', 'Bromazolam', 'Bromophenethylamine', 'Brotizolam', 'Bufotenine ', 'Buprenorphine', 'Butabarbital ', 'Butalbital', 'Butallylonal', 'Butethal ', 'Calusterone', 'Camazepam', 'Cannabinol', 'Cannabinol derivatives ', 'Cannabis', 'Sativex', 'Carfentanyl', 'Cathinone', 'CBPMs', 'Chlordiazepoxide', 'Chloromethamphetamine', 'Chloroamphetamine', 'Chlorphentermine', 'Chlorophenethylamine', 'Chorionic gonadotrophin ', 'Clenbuterol', 'Clobazam', 'Clonazepam', 'Clonazolam', 'Clonitazene', 'Clorazepic acid', 'Clostebol', 'Clotiazepam', 'Cloxazolam', 'Coca leaf', 'Cocaethylene ', 'Cocaine', 'Codeine', 'Cyclobarbital ', 'Cyclopentobarbital ', 'Cyclopropylmethylamine', 'Danazol', 'Delorazepam', 'Deschloroetizolam', 'Desomorphine', 'Desoxymethyltestosterone', 'Desoxypipradrol ', 'Dextromoramide', 'Dextropropoxyphene', 'Diamorphine ', 'Diampromide', 'Diazepam', 'Diclazepam', 'Diethylpropion', 'Diethylthiambutene', 'Difenoxin', 'Dihydrocodeine', 'Dimethylamine', 'Dihydroetorphine', 'Dihydromorphine', 'Dimenoxadole', 'Dimepheptanol', 'Dimethylthiambutene', 'Dioxaphetyl butyrate', 'Diphenoxylate', 'Diphenylprolinol ', 'Dipipanone', 'Dronabinol', 'Drotebanol ', 'Drostanolone', 'Ecgonine', 'Enestebol', 'Epidyolex', 'Epitiostanol', 'Estazolam', 'Ethchlorvynol', 'Ethinamate', 'Ethyl loflazepate', 'Ethylmethylthiambutene', 'Ethylmorphine ', 'Ethylnaphthidate', 'Ethyloestrenol', 'Ethylphenidate', 'Eticyclidine', 'Etizolam', 'Etonitazene', 'Etorphine', 'Etoxeridine', 'Etryptamine', 'Fencamfamin', 'Fenethylline', 'Fenproporex', 'Fentanyl', 'Flualprazolam', 'Flubromazepam', 'Flubromazolam', 'Fludiazepam', 'Flunitrazepam', 'Flunitrazolam', 'Fluorophenethylamine', 'Fluoxymesterone', 'Flurazepam', 'Fonazepam', 'Formebolone', 'Fungus  which contains psilocin or an ester of psilocin', 'Furazabol', 'Furethidine', 'Gestrinone', 'Glutethimide', 'Halazepam', 'Haloxazolam', 'Heptobarbital ', 'Hexethal', 'Homoveratrylamine ', 'Hydroxybenzoylecgonine', 'Hydroxycocaine', 'Hydrocodone ', 'Hydromorphinol ', 'Hydromorphone', 'Hydroxypethidine', 'Isomethadone', 'Isopropylphenidate', 'Ketamine', 'Ketazolam', 'Ketobemidone', 'Khat', 'Lefetamine', 'Levomethorphan', 'Levomoramide', 'Levophenacylmorphan', 'Lisdexamphetamine', 'Lofentanil', 'Loprazolam', 'Lorazepam', 'Lormetazepam', 'Lysergamide', 'Lysergic acid diethylamide ', 'Lysergide ', 'Mazindol', 'Mebolazine', 'Meclonazepam', 'Mecloqualone', 'Medazepam', 'Mefenorex', 'Mephentermine', 'Mepitiostane', 'Meprobamate', 'Mesabolone', 'Mescaline', 'Mesocarb', 'Mestanolone', 'Metazocine', 'Mesterolone', 'Methadone', 'Methadyl acetate', 'Methylamphetamine', 'Methylmorphenate', 'Methylnaphthidate', 'Methandienone', 'Methandriol', 'Methaqualone', 'Methcathinone ', 'Methenolone', 'Methoxyphenethylamine', 'Methyldesorphine', 'Methyldihydromorphine ', 'Methylecgonine', 'Methylenedioxyamphetamine ', 'Methylenedioxyethylamphetamine ', 'Methylenedioxypyrovalerone ', 'Methylphenidate', 'Methylphenobarbital ', 'Methyltestosterone', 'Methyprylone', 'Metizolam', 'Metopon', 'Metribolone', 'Mibolerone', 'Midazolam', 'Morpheridine', 'Morphine', 'Morphine methobromide ', 'Myrophine', 'Nabilone', 'Nandrolone', 'Napthylpyrovalerone ', 'Nealbarbitone', 'Nicocodine', 'Nicodicodine ', 'Nicomorphine ', 'Nifoxipam', 'Nimetazepam', 'Nitrazepam', 'Nitrazolam', 'Noracymethadol', 'Norboletone', 'Norclostebol', 'Norcocaine', 'Norcodeine', 'Nordazepam', 'Norethandrolone', 'Norfludiazepam', 'Norlevorphanol', 'Normethadone', 'Normorphine', 'Norpethidine ', 'Norpipanone', 'Opium', 'Oripavine', 'Ovandrotone', 'Oxabolone', 'Oxandrolone', 'Oxazepam', 'Oxazolam', 'Oxycodone', 'Oxymesterone', 'Oxymetholone', 'Oxymorphone', 'Pemoline', 'Pentazocine', 'Pentobarbital ', 'Pethidine ', 'Phenadoxone', 'Phenampromide', 'Phenazocine', 'Phencyclidine ', 'Phendimetrazine', 'Phenmetrazine', 'Phenobarbital ', 'Phenomorphan', 'Phenoperidine', 'Phentermine', 'Pholcodine ', 'Piminodine', 'Pinazepam', 'Pipradrol', 'Piritramide', 'Poppy straw ', 'Prasterone ', 'Prazepam', 'Probarbital ', 'Proheptazine', 'Propallylonal', 'Properidine ', 'Propetandrol', 'Propiram', 'Propylbenzoylecgonine', 'Propylphenidate', 'Prostanozol', 'Proxibarbital ', 'Psilocin', 'Pyrazolam', 'Pyrovalerone', 'Quinalbarbital ', 'Quinbolone', 'Racemethorphan', 'Racemoramide', 'Racemorphan', 'Remifentanil', 'Rolicyclidine', 'Roxibolone', 'Secbutobarbital ', 'Silandrone', 'Somatotropin', 'Somatrem', 'Somatropin', 'Stanolone', 'Stanozolol', 'Stenbolone', 'Sufentanil', 'Talbutal', 'Tapentadol', 'Temazepam', 'Tenocyclidine', 'Testosterone', 'Tetrahydrocannabinol ', 'Tetrahydrogestrinone', 'Tetrazepam', 'Thebacon ', 'Thebaine', 'Thiomesterone', 'Tilidine', 'Tramadol', 'Trenbolone', 'Triazolam', 'Trimeperidine', 'Vinbarbital ', 'Vinylbital ', 'Zaleplon', 'Zeranol', 'Zilpaterol', 'Zipeprol', 'Zolpidem', 'Zopiclone']
+medicamentos = ['Adinazolam', 'Alfentanil', 'Alphenal ', 'Alprazolam', 'Amineptine', 'Aminorex', 'Atamestane', 'Barbital ', 'Bolandiol', 'Bolazine', 'Boldenone', 'Boldione', 'Bolenol', 'Bromazepam', 'Bromazolam', 'Brotizolam', 'Butalbital', 'Butethal ', 'Camazepam', 'Cannabinol', 'Cannabis', 'Sativex', 'Cathinone', 'CBPMs', 'Clobazam', 'Clonazepam', 'Clonazolam', 'Clostebol', 'Cloxazolam', 'Coca leaf', 'Cocaine', 'Codeine', 'Danazol', 'Diazepam', 'Diclazepam', 'Difenoxin', 'Dipipanone', 'Dronabinol', 'Ecgonine', 'Enestebol', 'Epidyolex', 'Estazolam', 'Ethinamate', 'Etizolam', 'Etorphine', 'Fentanyl', 'Flurazepam', 'Fonazepam', 'Furazabol', 'Gestrinone', 'Halazepam', 'Hexethal', 'Ketamine', 'Ketazolam', 'Khat', 'Lefetamine', 'Lofentanil', 'Loprazolam', 'Lorazepam', 'Lysergide ', 'Mazindol', 'Mebolazine', 'Medazepam', 'Mefenorex', 'Mesabolone', 'Mescaline', 'Mesocarb', 'Metazocine', 'Methadone', 'Metizolam', 'Metopon', 'Mibolerone', 'Midazolam', 'Morphine', 'Myrophine', 'Nabilone', 'Nandrolone', 'Nicocodine', 'Nifoxipam', 'Nitrazepam', 'Nitrazolam', 'Norcocaine', 'Norcodeine', 'Nordazepam', 'Opium', 'Oripavine', 'Oxabolone', 'Oxazepam', 'Oxazolam', 'Oxycodone', 'Pemoline', 'Pethidine ', 'Piminodine', 'Pinazepam', 'Pipradrol', 'Prazepam', 'Propiram', 'Psilocin', 'Pyrazolam', 'Quinbolone', 'Roxibolone', 'Silandrone', 'Somatrem', 'Somatropin', 'Stanolone', 'Stanozolol', 'Stenbolone', 'Sufentanil', 'Talbutal', 'Tapentadol', 'Temazepam', 'Tetrazepam', 'Thebacon ', 'Thebaine', 'Tilidine', 'Tramadol', 'Trenbolone', 'Triazolam', 'Zaleplon', 'Zeranol', 'Zilpaterol', 'Zipeprol', 'Zolpidem', 'Zopiclone']
 
-def generate_receitas(consultas):
+
+
+medicamentos_especialidade = {
+  esp: random.sample(medicamentos, random.randint(6, 10)) for esp in [e['nome'] for e in especialidades]
+}
+
+def generate_receitas(consultas, medicos):
   receitas = []
   for consulta in consultas:
+    esp = [m['especialidade'] for m in medicos if m['nif'] == consulta['nif']][0]
     if random.random() < 0.8:
-      for medicamento in random.sample(medicamentos, random.randint(1, 6)):
+      for medicamento in random.sample(medicamentos_especialidade[esp], random.randint(1, 6)):
         receitas.append({
           'codigo_sns': consulta['codigo_sns'],
           'medicamento': medicamento,
@@ -260,13 +263,14 @@ def main():
   trabalha = generate_trabalha(medicos, clinicas)
   pacientes = generate_pacientes(5000)
   consultas = generate_consultas(pacientes, trabalha, clinicas)
-  receitas = generate_receitas(consultas)
+  receitas = generate_receitas(consultas, medicos)
   observacoes = generate_observacoes(consultas)
   sql_statements.append(dict_to_sql('clinica', clinicas))
   sql_statements.append(dict_to_sql('enfermeiro', generate_enfermeiros(clinicas)))
   sql_statements.append(dict_to_sql('medico', medicos))
   sql_statements.append(dict_to_sql('trabalha', trabalha))
   sql_statements.append(dict_to_sql('paciente', pacientes))
+  [c.pop('id') for c in consultas]
   sql_statements.append(dict_to_sql('consulta', consultas))
   sql_statements.append(dict_to_sql('receita', receitas))
   sql_statements.append(dict_to_sql('observacao', observacoes))
