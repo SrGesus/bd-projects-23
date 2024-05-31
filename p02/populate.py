@@ -113,11 +113,12 @@ def generate_trabalha(medicos, clinicas):
       break
   return trabalha
 
+ssn = 10000000000
 def generate_pacientes(num_pacientes):
   pacientes = []
   global nif
   global telefone
-  ssn = 10000000000
+  global ssn
   for paciente_id in range(1, num_pacientes + 1):
     i = random.randint(0, len(moradas) - 1)
     morada = moradas[i][0].replace('%', str(moradas[i][1]))
@@ -136,7 +137,7 @@ def generate_pacientes(num_pacientes):
     ssn += random.randint(1, 1000000)
   return pacientes
 
-def generate_consultas(pacientes, trabalha, clinicas):
+def generate_consultas(pacientes, trabalha, clinicas, pacientes_cronicos):
   consultas = []
   global nif
   global telefone
@@ -147,9 +148,11 @@ def generate_consultas(pacientes, trabalha, clinicas):
   current_date = start_date
   counter = 0
   pacientes_hoje = pacientes.copy()
+  pacientes_cronicos_hoje = pacientes_cronicos.copy()
   while current_date <= end_date:
     if counter % 6 == 0:
       pacientes_hoje = pacientes.copy()
+      pacientes_cronicos_hoje = pacientes_cronicos.copy()
     for clinica in clinicas:
       dia_da_semana = current_date.weekday() + 1
       medicos_clinica = [t['nif'] for t in trabalha if t['nome'] == clinica['nome'] and t['dia_da_semana'] == dia_da_semana]
@@ -158,10 +161,24 @@ def generate_consultas(pacientes, trabalha, clinicas):
       for medico_nif in medicos_clinica:
         # 3 consultas por médico garante que há pelo menos 
         # 21 consultas por dia nesta clínica
-        for hora in random.sample(horas, random.randint(3, 20)):
+        horas_medico = horas.copy()
+        for hora in random.sample(horas_medico, random.randint(2, 3)):
+          horas_medico.remove(hora)
           consultas.append({
             'id': consulta_id,
             'ssn': pacientes_hoje.pop(random.randint(0, len(pacientes_hoje) - 1))['ssn'],
+            'nif': medico_nif,
+            'nome': clinica['nome'],
+            'data': current_date.isoformat(),
+            'hora': hora,
+            'codigo_sns': str(codigo_sns).zfill(12)
+          })
+          consulta_id += 1
+          codigo_sns += random.randint(1, 8000)
+        for hora in random.sample(horas_medico, 1):
+          consultas.append({
+            'id': consulta_id,
+            'ssn': pacientes_cronicos_hoje.pop(random.randint(0, len(pacientes_cronicos_hoje) - 1))['ssn'],
             'nif': medico_nif,
             'nome': clinica['nome'],
             'data': current_date.isoformat(),
@@ -261,15 +278,16 @@ def main():
   clinicas = generate_clinicas()
   medicos = generate_medicos(especialidades)
   trabalha = generate_trabalha(medicos, clinicas)
-  pacientes = generate_pacientes(5000)
-  consultas = generate_consultas(pacientes, trabalha, clinicas)
+  pacientes = generate_pacientes(4640)
+  pacientes_cronicos = generate_pacientes(360)
+  consultas = generate_consultas(pacientes, trabalha, clinicas, pacientes_cronicos)
   receitas = generate_receitas(consultas, medicos)
   observacoes = generate_observacoes(consultas)
   sql_statements.append(dict_to_sql('clinica', clinicas))
   sql_statements.append(dict_to_sql('enfermeiro', generate_enfermeiros(clinicas)))
   sql_statements.append(dict_to_sql('medico', medicos))
   sql_statements.append(dict_to_sql('trabalha', trabalha))
-  sql_statements.append(dict_to_sql('paciente', pacientes))
+  sql_statements.append(dict_to_sql('paciente', pacientes+pacientes_cronicos))
   [c.pop('id') for c in consultas]
   sql_statements.append(dict_to_sql('consulta', consultas))
   sql_statements.append(dict_to_sql('receita', receitas))

@@ -150,7 +150,7 @@ def consultas_regista(clinica):
     if not hora:
         return jsonify({"error": "Parâmetro hora em falta"}), 400
     if hora and not re.match(r"\d{2}:\d{2}:\d{2}", hora):
-        return jsonify({"error": "Bad Request: Formato de hora inválido"}), 400
+        return jsonify({"error": "Formato de hora inválido"}), 400
     
     verifica_data_query = """SELECT 1 
     FROM distinct_horas 
@@ -167,7 +167,7 @@ def consultas_regista(clinica):
 
     verifica_medico_query = """
     SELECT nif FROM medico
-    WHERE nif = %s;
+    WHERE nome = %s;
     """
 
     regista_query = """
@@ -175,28 +175,45 @@ def consultas_regista(clinica):
     """
 
     with psycopg.connect(conninfo=DATABASE_URL) as conn:
+        conn.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;")
         with conn.cursor(row_factory=namedtuple_row) as cur:
             cur.execute(verifica_paciente_query, (paciente,))
             if cur.rowcount == 0:
-                return jsonify({"error": "Paciente não encontrado"}), 404
+                return jsonify({"error": "Paciente não está registado."}), 404
             cur.fetchall()
             cur.execute(verifica_medico_query, (medico,))
             if cur.rowcount == 0:
-                return jsonify({"error": "Médico não encontrado"}), 404
-            cur.fetchall()
+                return jsonify({"error": "Médico não encontrado."}), 404
+            nif = cur.fetchone().nif
             cur.execute(verifica_data_query, {
                     "data": data, "hora": hora,
                 })
             if cur.rowcount == 0:
-                return jsonify({"error": "A data e hora têm que ser futuras"}), 400
+                return jsonify({"error": "A data e hora têm que ser futuras num incremento de 30 minutos no horário 8-13h ou 14-19h."}), 400
             cur.fetchall()
             try:
-                cur.execute(regista_query, (paciente, medico, clinica, data, hora))
+                cur.execute(regista_query, (paciente, nif, clinica, data, hora))
             except psycopg.errors.RaiseException as e:
-                return jsonify({"error": "O médico não está a trabalhar nesta clínica nessa data"}), 400
+                conn.rollback()
+                return jsonify({"error": f"{e.diag.message_primary}"}), 400
             except psycopg.errors.UniqueViolation as e:
-                return jsonify({"error": "O paciente ou o médico já têm uma consulta nesta data e hora"}), 400
-            conn.commit()
+                if "consulta_nif_data_hora_key" in str(e):
+                    conn.rollback()
+                    return jsonify({"error": "O médico já tem uma consulta nesta data e hora."}), 400
+                if "consulta_ssn_data_hora_key" in str(e):
+                    conn.rollback()
+                    return jsonify({"error": "O paciente já tem uma consulta nesta data e hora."}), 400
+                else:
+                    conn.rollback()
+                    return jsonify({"error": f"Erro ao registar consulta: {e.diag.message_primary}"}), 400
+            except psycopg.Error as e:
+                conn.rollback()
+                return jsonify({"error": f"Erro ao registar consulta: {e.diag.primary_message}"}), 500
+            except:
+                conn.rollback()
+                return jsonify({"error": f"Erro interno."}), 500
+            finally:
+                conn.commit()
             log.debug(f"Marcação registada: paciente {paciente}, medico {medico}, clinica {clinica}, data {data}, hora {hora}")
     
     return jsonify({"success": "Marcação registada com sucesso"}), 200
@@ -213,17 +230,17 @@ def consulta_delete(clinica):
     hora = request.json.get('hora')  
 
     if not paciente:
-        return jsonify({"error": "Parâmetro paciente em falta"}), 400
+        return jsonify({"error": "Parâmetro paciente em falta."}), 400
     if not medico:
-        return jsonify({"error": "Parâmetro medico em falta"}), 400
+        return jsonify({"error": "Parâmetro medico em falta."}), 400
     if not data:
-        return jsonify({"error": "Parâmetro data em falta"}), 400
+        return jsonify({"error": "Parâmetro data em falta."}), 400
     if data and not re.match(r"\d{4}-\d{2}-\d{2}", data):
-        return jsonify({"error": "Formato de data inválido"}), 400
+        return jsonify({"error": "Formato de data inválido."}), 400
     if not hora:
-        return jsonify({"error": "Parâmetro hora em falta"}), 400
+        return jsonify({"error": "Parâmetro hora em falta."}), 400
     if hora and not re.match(r"\d{2}:\d{2}:\d{2}", hora):
-        return jsonify({"error": "Bad Request: Formato de hora inválido"}), 400
+        return jsonify({"error": "Formato de hora inválido."}), 400
     
     verifica_data_query = """SELECT 1 
     FROM distinct_horas 
@@ -252,19 +269,27 @@ def consulta_delete(clinica):
     """
     
     with psycopg.connect(conninfo=DATABASE_URL) as conn:
+        conn.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;")
         with conn.cursor(row_factory=namedtuple_row) as cur:
             cur.execute(receita_query, (paciente, medico, clinica, data, hora))
             if cur.rowcount == 0:
-                return jsonify({"error": "Marcação não encontrada"}), 404
+                return jsonify({"error": "Marcação não encontrada."}), 404
             receita = cur.fetchone()
             cur.execute(verifica_data_query, {
                     "data": data, "hora": hora,
                 })
             if cur.rowcount == 0:
-                return jsonify({"error": "Só podes cancelar consultas futuras"}), 400
-            cur.execute(delete_receita_query, (receita.codigo_sns,))
-            cur.execute(delete_observacao_query, (receita.id,))
-            cur.execute(delete_consulta_query, (receita.id,))
+                return jsonify({"error": "Não é possível cancelar uma consulta que já ocorreu."}), 400
+            try:
+                cur.execute(delete_receita_query, (receita.codigo_sns,))
+                cur.execute(delete_observacao_query, (receita.id,))
+                cur.execute(delete_consulta_query, (receita.id,))
+            except psycopg.Error as e:
+                conn.rollback()
+                return jsonify({"error": f"Erro ao cancelar consulta: {e.diag.primary_message}"}), 500
+            except:
+                conn.rollback()
+                return jsonify({"error": f"Erro interno."}), 500
             conn.commit()
             log.debug(f"Marcação cancelada: paciente {paciente}, medico {medico}, clinica {clinica}, data {data}, hora {hora}")
     

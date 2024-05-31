@@ -1,0 +1,20 @@
+meta {
+  name: Consulta registar
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:8080/a/Centro Clinico dos Anjos/registar/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "data": "2024-06-03",
+      "hora": "08:30:00",
+      "medico": "Diego Ibarra",
+      "paciente": "11536094828"
+    }
+}
